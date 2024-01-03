@@ -41,7 +41,7 @@ class SecurityController extends AbstractController
         // throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/oubli-pass', name: 'app_forgotten_password')]
+    /*#[Route(path: '/oubli-pass', name: 'app_forgotten_password')]
     public function oubliPass(Request $request, UsersRepository $users, Swift_Mailer $mailer, TokenGeneratorInterface $tokenGenerator): Response
     {
 
@@ -135,5 +135,5 @@ class SecurityController extends AbstractController
             // Si on n'a pas reçu les données, on affiche le formulaire
             return $this->render('security/reset_password.html.twig', ['token' => $token]);
         }
-    }
+    }*/
 }

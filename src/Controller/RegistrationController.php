@@ -31,10 +31,9 @@ class RegistrationController extends AbstractController
                              MailerInterface $mailer, EntityManagerInterface $entityManager): Response
     {
         $user = new Users();
-
         $form = $this->createForm(RegistrationFormType::class, $user);
-
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
             $user->setPassword(
@@ -43,49 +42,21 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            // On génère un token et on l'enregistre
-            $user->setActivationToken(md5(uniqid()));
-
-            $user->setRoles(['ROLE_USER']);
-            $mails = $form->get('email')->getData();
-            $user->setEmail($mails);
             $entityManager->persist($user);
             $entityManager->flush();
+            // do anything else you need here, like send an email
 
-            // On crée le message
-            $message = (new Email())
-                // On attribue l'expéditeur
-                //->setFrom('votre@adresse.fr')
-                ->from($this->getParameter('sender'))
-
-                //// On attribue le destinataire
-                ->to($mails)
-
-                //// On crée le texte avec la vue
-                ->html
-                (
-                    $this->renderView(
-                        'emails/activation.html.twig', ['token' => $user->getActivationToken()]
-                    ),
-                    'text/html'
-                );
-            $mailer->send($message);
-
-
-            $authenticatedToken = $authenticatorManager->authenticateUser($user, $authenticator, $request);
-
-            if ($authenticatedToken) {
-                $this->addFlash('success', 'Registration successful!');
-
-                return $this->redirectToRoute('main'); // replace 'main' with the route you want to redirect to
-            }
+            return $this->redirectToRoute('main');
         }
-
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
     }
+
+
+
+
 
     #[Route('/activation/{token}', name: 'activation')]
     public function activation($token, UsersRepository $users, EntityManagerInterface $entityManager): RedirectResponse
